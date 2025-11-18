@@ -11,6 +11,9 @@ require_role($user, ['admin', 'superadmin']);
 
 $logFile = __DIR__ . '/../logs/journal.log';
 
+// Définir la timezone locale
+date_default_timezone_set('Europe/Paris'); // <- change selon ton fuseau
+
 // Pagination : 4 logs par page
 $perPage = 4;
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
@@ -65,30 +68,50 @@ include __DIR__ . '/../includes/header.php';
             <tbody>
                 <?php
                 if (file_exists($logFile)) {
-                    $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-                    $totalLines = count($lines);
+                    $allLines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                    $filteredLines = [];
+
+                    // Filtrage avant pagination
+                    foreach ($allLines as $line) {
+                        $entry = json_decode($line, true);
+                        if (!$entry) continue;
+
+                        $action = $entry['action'] ?? '';
+                        $status = $entry['status'] ?? (strtolower($action)==='delete_user' ? 'suspecte' : 'normal');
+
+                        if ($filterAction && strtolower($action) !== strtolower($filterAction)) continue;
+                        if ($statusFilter && strtolower($status) !== strtolower($statusFilter)) continue;
+
+                        $filteredLines[] = $line;
+                    }
+
+                    // Tri décroissant par date (logs récents en premier)
+                    usort($filteredLines, function($a, $b){
+                        $aData = json_decode($a, true);
+                        $bData = json_decode($b, true);
+                        $aTime = isset($aData['ts']) ? strtotime($aData['ts']) : 0;
+                        $bTime = isset($bData['ts']) ? strtotime($bData['ts']) : 0;
+                        return $bTime - $aTime;
+                    });
+
+                    $totalLines = count($filteredLines);
                     $totalPages = ceil($totalLines / $perPage);
                     $offset = ($page - 1) * $perPage;
-                    $lines = array_slice($lines, $offset, $perPage);
+                    $lines = array_slice($filteredLines, $offset, $perPage);
 
                     foreach ($lines as $line) {
-                          $entry = json_decode($line, true);
-                            if (!$entry) continue;
+                        $entry = json_decode($line, true);
+                        if (!$entry) continue;
 
-                            $ts = $entry['ts'] ?? '';
-                            $ip = $entry['ip'] ?? '';
-                            $username = $entry['user'] ?? '';
-                            $action = $entry['action'] ?? '';
-                            $ctx = isset($entry['ctx']) && !empty($entry['ctx']) ? json_encode($entry['ctx'], JSON_UNESCAPED_SLASHES) : '-';
-                            $ua = $entry['ua'] ?? '';
+                        $ts = $entry['ts'] ?? '';
+                        $ip = $entry['ip'] ?? '';
+                        $username = $entry['user'] ?? '';
+                        $action = $entry['action'] ?? '';
+                        $ctx = isset($entry['ctx']) && !empty($entry['ctx']) ? json_encode($entry['ctx'], JSON_UNESCAPED_SLASHES) : '-';
+                        $ua = $entry['ua'] ?? '';
 
-                            // statut par défaut si non défini
-                            $status = $entry['status'] ?? (strtolower($action)==='delete_user' ? 'suspecte' : 'normal');
+                        $status = $entry['status'] ?? (strtolower($action)==='delete_user' ? 'suspecte' : 'normal');
 
-                            // Filtre action
-                            if ($filterAction && strtolower($action) !== strtolower($filterAction)) continue;
-                            // Filtre statut
-                            if ($statusFilter && strtolower($status) !== strtolower($statusFilter)) continue;
                         switch(strtolower($action)){
                             case 'login': $badge='ok'; break;
                             case 'logout': $badge='warn'; break;
@@ -97,7 +120,13 @@ include __DIR__ . '/../includes/header.php';
                             default: $badge='unknown';
                         }
 
-                        $tsFormatted = $ts ? (new DateTime($ts))->format('d/m/Y H:i:s') : '';
+                        // Conversion en heure locale
+                        $tsFormatted = '';
+                        if ($ts) {
+                            $dt = new DateTime($ts, new DateTimeZone('UTC'));
+                            $dt->setTimezone(new DateTimeZone(date_default_timezone_get()));
+                            $tsFormatted = $dt->format('d/m/Y H:i:s');
+                        }
 
                         echo '<tr class="row-'.$badge.'">';
                         echo '<td>' . htmlspecialchars($tsFormatted) . '</td>';
@@ -144,6 +173,9 @@ include __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
+<!-- style inchangé -->
+
+
 <style>
 body { background:#121212; color:#e0e0e0; font-family:Arial, sans-serif; }
 h1.page-title { color:#fff; margin-bottom:20px; }
@@ -173,4 +205,4 @@ h1.page-title { color:#fff; margin-bottom:20px; }
 .pagination { text-align:center; padding:10px; }
 .page-link { margin:0 3px; padding:4px 8px; border:1px solid #555; border-radius:4px; text-decoration:none; color:#ccc; }
 .page-link.active { background:#1976d2; color:#fff; border-color:#1976d2; }
-</
+</style>
