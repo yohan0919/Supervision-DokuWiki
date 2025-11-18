@@ -11,7 +11,7 @@ require_role($user, ['admin', 'superadmin']);
 
 $logFile = __DIR__ . '/../logs/journal.log';
 
-$perPage = 10;
+$perPage = 4;
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $filterAction = $_GET['action'] ?? '';
 
