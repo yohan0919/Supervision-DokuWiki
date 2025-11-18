@@ -11,9 +11,11 @@ require_role($user, ['admin', 'superadmin']);
 
 $logFile = __DIR__ . '/../logs/journal.log';
 
+// Pagination : 4 logs par page
 $perPage = 4;
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $filterAction = $_GET['action'] ?? '';
+$statusFilter = $_GET['status'] ?? '';
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -33,6 +35,15 @@ include __DIR__ . '/../includes/header.php';
                 <option value="delete_user" <?= $filterAction==='delete_user'?'selected':''; ?>>Delete</option>
                 <option value="totp_reset" <?= $filterAction==='totp_reset'?'selected':''; ?>>TOTP Reset</option>
             </select>
+
+            <label for="status">Filtrer par statut :</label>
+            <select name="status" id="status">
+                <option value="">Tous</option>
+                <option value="suspecte" <?= $statusFilter==='suspecte'?'selected':''; ?>>Suspecte</option>
+                <option value="verifiee" <?= $statusFilter==='verifiee'?'selected':''; ?>>Vérifiée</option>
+                <option value="normal" <?= $statusFilter==='normal'?'selected':''; ?>>Normal</option>
+            </select>
+
             <button type="submit" class="btn btn-secondary">Filtrer</button>
         </form>
         <a href="export_logs.php" class="btn btn-primary">Exporter CSV</a>
@@ -61,21 +72,23 @@ include __DIR__ . '/../includes/header.php';
                     $lines = array_slice($lines, $offset, $perPage);
 
                     foreach ($lines as $line) {
+                          $entry = json_decode($line, true);
+                            if (!$entry) continue;
 
-                        $dt = new DateTime('now', new DateTimeZone('Europe/Paris'));
-                        $entry = json_decode($line, true);
-                        if (!$entry) continue;
+                            $ts = $entry['ts'] ?? '';
+                            $ip = $entry['ip'] ?? '';
+                            $username = $entry['user'] ?? '';
+                            $action = $entry['action'] ?? '';
+                            $ctx = isset($entry['ctx']) && !empty($entry['ctx']) ? json_encode($entry['ctx'], JSON_UNESCAPED_SLASHES) : '-';
+                            $ua = $entry['ua'] ?? '';
 
-                        $ts = $entry['ts'] ?? '';
-                        $ip = $entry['ip'] ?? '';
-                        $username = $entry['user'] ?? '';
-                        $action = $entry['action'] ?? '';
-                        $ctx = isset($entry['ctx']) && !empty($entry['ctx']) ? json_encode($entry['ctx'], JSON_UNESCAPED_SLASHES) : '-';
-                        $ua = $entry['ua'] ?? '';
-                        $status = $entry['status'] ?? null;
+                            // statut par défaut si non défini
+                            $status = $entry['status'] ?? (strtolower($action)==='delete_user' ? 'suspecte' : 'normal');
 
-                        if ($filterAction && strtolower($action) !== strtolower($filterAction)) continue;
-
+                            // Filtre action
+                            if ($filterAction && strtolower($action) !== strtolower($filterAction)) continue;
+                            // Filtre statut
+                            if ($statusFilter && strtolower($status) !== strtolower($statusFilter)) continue;
                         switch(strtolower($action)){
                             case 'login': $badge='ok'; break;
                             case 'logout': $badge='warn'; break;
@@ -83,7 +96,7 @@ include __DIR__ . '/../includes/header.php';
                             case 'delete_user': $badge='crit'; break;
                             default: $badge='unknown';
                         }
-                        
+
                         $tsFormatted = $ts ? (new DateTime($ts))->format('d/m/Y H:i:s') : '';
 
                         echo '<tr class="row-'.$badge.'">';
@@ -116,7 +129,9 @@ include __DIR__ . '/../includes/header.php';
 
                     echo '<tr><td colspan="7" class="pagination">';
                     for ($i=1; $i<=$totalPages; $i++) {
-                        $link = '?page='.$i.($filterAction ? '&action='.$filterAction : '');
+                        $link = '?page='.$i
+                              .($filterAction ? '&action='.$filterAction : '')
+                              .($statusFilter ? '&status='.$statusFilter : '');
                         echo '<a href="'.$link.'" class="page-link '.($i==$page?'active':'').'">'.$i.'</a> ';
                     }
                     echo '</td></tr>';
@@ -158,6 +173,4 @@ h1.page-title { color:#fff; margin-bottom:20px; }
 .pagination { text-align:center; padding:10px; }
 .page-link { margin:0 3px; padding:4px 8px; border:1px solid #555; border-radius:4px; text-decoration:none; color:#ccc; }
 .page-link.active { background:#1976d2; color:#fff; border-color:#1976d2; }
-</style>
-
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+</
