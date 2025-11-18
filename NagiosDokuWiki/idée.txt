@@ -1,0 +1,27 @@
+Pages supervision : 
+
+Améliorer l'affichage, permettre de dérouler l'onglet " Pages " et voir les pages dans le dossier 
+Pareil pour médias 
+Structurer les éléments 
+Lien vers les fichiers
+Afficher un avertissement si les permissions sont trop ouvertes
+
+Pages Utilisateurs : 
+
+Quand on veut créer un nouveau utilisateur, on devrait avoir une vérification avec notre TOTP 
+Ne pas pouvoir supprimer les autres comptes admin mais que les comptes utilisateurs
+Ne pas pouvoir réinitialiser le TOTP d'un autre admin et quand on veut modifier le mdp d'un autre admin sa demande le TOTP du compte qu'on veut modifier
+Ajouter un système de clé de récupération sur les comptes admins au cas ou ont perd le TOTP ou le mdp d'un compte
+
+
+Pages Journal : 
+
+Améliorer la visibilité 
+Pouvoir filtrer les actions 
+Formatage des dates
+Mettre en évidence les actions critiques
+Permettre l’export des logs pour analyse externe
+Si le journal est long, éviter le scroll infini en paginant ou en chargeant par lots
+Notifier l’admin en cas d'action inhabituelle
+Permettre à l’admin de marquer une ligne comme “suspecte” ou “vérifiée”
+

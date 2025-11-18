@@ -1,0 +1,112 @@
+/* public/css/styles.css - style Nagios-like simplifié */
+:root{
+  --bg:#0b1020; --card:#0f172a; --muted:#9ca3af;
+  --ok:#22c55e; --warn:#f59e0b; --crit:#ef4444; --unknown:#6b7280;
+  --text:#e6eef8; --accent:#2563eb;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;color:var(--text);background:linear-gradient(180deg,#05060a 0%, #071029 100%)}
+.topbar{display:flex;align-items:center;gap:1rem;padding:0.8rem 1rem;border-bottom:1px solid rgba(255,255,255,0.04);background:transparent}
+.brand{font-size:1.15rem}
+.brand .muted{color:var(--muted);font-weight:300;margin-left:.35rem}
+.nav{display:flex;gap:.5rem;margin-left:1rem}
+.nav-link{color:var(--text);padding:.45rem .6rem;border-radius:.4rem;text-decoration:none;border:1px solid transparent}
+.nav-link:hover{background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.03)}
+.userbox{margin-left:auto;display:flex;gap:.6rem;align-items:center}
+.btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:.35rem .6rem;border-radius:.45rem;color:var(--text);text-decoration:none}
+.container{max-width:1200px;margin:1rem auto;padding:0 1rem}
+.page-header{display:flex;align-items:center;gap:1rem}
+.page-title{margin:0;font-size:1.25rem}
+.legend{margin-left:auto;display:flex;gap:.5rem;align-items:center}
+.badge{display:inline-block;padding:.25rem .5rem;border-radius:.35rem;font-weight:600;font-size:.85rem}
+.badge.ok{background:rgba(34,197,94,0.12);color:var(--ok);border:1px solid rgba(34,197,94,0.12)}
+.badge.warn{background:rgba(245,158,11,0.12);color:var(--warn);border:1px solid rgba(245,158,11,0.12)}
+.badge.crit{background:rgba(239,68,68,0.12);color:var(--crit);border:1px solid rgba(239,68,68,0.12)}
+.badge.unknown{background:rgba(107,114,128,0.12);color:var(--unknown);border:1px solid rgba(107,114,128,0.12)}
+
+.card{background:var(--card);border:1px solid rgba(255,255,255,0.03);padding:1rem;border-radius:.75rem;margin:1rem 0}
+.table{width:100%;border-collapse:collapse;margin-top:.5rem}
+.table th,.table td{padding:.6rem .8rem;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
+.table th{color:var(--muted);font-size:.9rem}
+.status-ok{color:var(--ok);font-weight:700}
+.status-warn{color:var(--warn);font-weight:700}
+.status-crit{color:var(--crit);font-weight:700}
+.status-unknown{color:var(--unknown);font-weight:700}
+
+/* Nagios-like rows with subtle colored left border */
+.row-ok{border-left:6px solid rgba(34,197,94,0.12)}
+.row-warn{border-left:6px solid rgba(245,158,11,0.12)}
+.row-crit{border-left:6px solid rgba(239,68,68,0.12)}
+.row-unknown{border-left:6px solid rgba(107,114,128,0.12)}
+
+.kv{display:grid;grid-template-columns:200px 1fr;gap:.4rem .8rem}
+.muted{color:var(--muted);font-size:.9rem}
+.site-footer{padding:1rem;text-align:center;color:var(--muted);font-size:.9rem;border-top:1px solid rgba(255,255,255,0.02);margin-top:2rem}
+/* --- Login page layout --- */
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.login-card h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+  color: var(--muted);
+}
+
+.form-group input {
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: #0b1225;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.3);
+}
+
+.btn.primary {
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 0.5rem;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+.btn.primary:hover {
+  background: #1d4ed8;
+                            }
